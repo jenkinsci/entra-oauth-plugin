@@ -1,0 +1,33 @@
+# Maven
+/target/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+
+# Logs
+*.log
+
+# IDEs and editors
+/.idea/
+*.iml
+/.vscode/
+.project
+.classpath
+.settings/
+.factorypath
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build tool metadata
+.mvn/timing.properties
+
+# Local runtime workspace
+/work/
