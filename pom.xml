@@ -4,11 +4,12 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>5.28</version>
+    <version>6.2116.v7501b_67dc517</version>
     <relativePath />
   </parent>
 
-  <artifactId>entra-oauth-plugin</artifactId>
+  <groupId>io.jenkins.plugins</groupId>
+  <artifactId>entra-oauth</artifactId>
   <version>${revision}${changelist}</version>
   <packaging>hpi</packaging>
 
@@ -17,8 +18,8 @@
 
   <licenses>
     <license>
-      <name>The Apache License, Version 2.0</name>
-      <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <name>MIT</name>
+      <url>https://opensource.org/license/mit</url>
       <distribution>repo</distribution>
     </license>
   </licenses>
@@ -35,7 +36,10 @@
     <changelist>-SNAPSHOT</changelist>
     <jenkins.baseline>2.541</jenkins.baseline>
     <jenkins.version>${jenkins.baseline}.1</jenkins.version>
-    <plugins.bom.version>6040.v20da_0b_1245d3</plugins.bom.version>
+    <plugins.bom.version>6055.v35edb_dc8d0f9</plugins.bom.version>
+    <changelist>999999-SNAPSHOT</changelist>
+    <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
+    <ban-commons-lang-2.skip>false</ban-commons-lang-2.skip>
   </properties>
 
   <dependencyManagement>
