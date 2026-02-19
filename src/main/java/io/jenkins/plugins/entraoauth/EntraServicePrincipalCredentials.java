@@ -28,7 +28,6 @@ public abstract class EntraServicePrincipalCredentials extends BaseStandardCrede
         implements StandardUsernameOAuth2Credentials<OAuth2ScopeRequirement> {
 
     private static final Logger LOGGER = Logger.getLogger(EntraServicePrincipalCredentials.class.getName());
-    private static final String DEFAULT_AUTHORITY_HOST = "https://login.microsoftonline.com";
 
     private final String tenantId;
     private final String clientId;
@@ -94,7 +93,7 @@ public abstract class EntraServicePrincipalCredentials extends BaseStandardCrede
     public String getAuthorityHost() {
         String host = Util.fixEmptyAndTrim(authorityHost);
         if (host == null) {
-            host = DEFAULT_AUTHORITY_HOST;
+            host = AbstractEntraCredentialsDescriptor.DEFAULT_AUTHORITY_HOST;
         }
         while (host.endsWith("/")) {
             host = host.substring(0, host.length() - 1);
@@ -168,16 +167,6 @@ public abstract class EntraServicePrincipalCredentials extends BaseStandardCrede
         return ConfidentialClientApplication.builder(getClientId(), credential)
                 .authority(authority)
                 .build();
-    }
-
-    protected static void validateRequired(String value, String field, java.util.function.Consumer<String> err) {
-        if (Util.fixEmptyAndTrim(value) == null) {
-            err.accept(field + " is required.");
-        }
-    }
-
-    protected static String defaultAuthorityHost() {
-        return DEFAULT_AUTHORITY_HOST;
     }
 }
 

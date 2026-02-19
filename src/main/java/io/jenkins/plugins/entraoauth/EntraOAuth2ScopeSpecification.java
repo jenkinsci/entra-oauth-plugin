@@ -3,12 +3,12 @@ package io.jenkins.plugins.entraoauth;
 import com.google.jenkins.plugins.credentials.oauth.OAuth2ScopeSpecification;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
-import java.util.Collection;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
  * Entra-specific OAuth2 scope specification for credential domains.
  */
+@SuppressWarnings("unused")
 public class EntraOAuth2ScopeSpecification extends OAuth2ScopeSpecification<EntraOAuth2ScopeRequirement> {
     private final String specifiedScopesText;
 
@@ -40,7 +40,7 @@ public class EntraOAuth2ScopeSpecification extends OAuth2ScopeSpecification<Entr
         @Override
         @NonNull
         public String getDisplayName() {
-            return Messages.entraOAuth2ScopeSpecification_DisplayName();
+            return Messages.EntraOAuth2ScopeSpecification_DisplayName();
         }
     }
 }

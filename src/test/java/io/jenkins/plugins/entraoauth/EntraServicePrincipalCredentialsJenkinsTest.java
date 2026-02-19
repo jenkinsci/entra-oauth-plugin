@@ -4,29 +4,28 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.CredentialsStore;
 import com.cloudbees.plugins.credentials.domains.Domain;
 import hudson.security.ACL;
-import hudson.util.ListBoxModel;
+import hudson.util.ComboBoxModel;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * JenkinsRule tests for Entra credentials.
+ * Jenkins integration tests for Entra credentials.
  */
+@WithJenkins
 public class EntraServicePrincipalCredentialsJenkinsTest {
-
-    @Rule
-    public JenkinsRule jenkins = new JenkinsRule();
 
     /**
      * Verifies credentials can be stored and retrieved.
      */
     @Test
-    public void credentialCanBeStoredAndRetrieved() throws Exception {
+    public void credentialCanBeStoredAndRetrieved(JenkinsRule jenkins) throws Exception {
         EntraServicePrincipalCredentials credentials = new EntraClientSecretCredentials(
                 com.cloudbees.plugins.credentials.CredentialsScope.GLOBAL,
                 "id",
@@ -48,10 +47,10 @@ public class EntraServicePrincipalCredentialsJenkinsTest {
         }
         store.addCredentials(Domain.global(), credentials);
 
-        List<EntraServicePrincipalCredentials> all = CredentialsProvider.lookupCredentials(
+        List<EntraServicePrincipalCredentials> all = CredentialsProvider.lookupCredentialsInItemGroup(
                 EntraServicePrincipalCredentials.class,
                 jenkins.getInstance(),
-                ACL.SYSTEM,
+                ACL.SYSTEM2,
                 Collections.emptyList());
 
         assertEquals(1, all.size());
@@ -62,16 +61,15 @@ public class EntraServicePrincipalCredentialsJenkinsTest {
      * Verifies tenant ID suggestions are present.
      */
     @Test
-    public void tenantIdItemsPresent() {
+    public void tenantIdItemsPresent(JenkinsRule jenkins) {
         EntraClientSecretCredentials.DescriptorImpl descriptor =
                 (EntraClientSecretCredentials.DescriptorImpl)
                         jenkins.getInstance().getDescriptor(EntraClientSecretCredentials.class);
 
-        ListBoxModel items = descriptor.doFillTenantIdItems();
-        assertTrue(items.stream().anyMatch(item -> "organizations".equals(item.value)));
-        assertTrue(items.stream().anyMatch(item -> "common".equals(item.value)));
-        assertTrue(items.stream().anyMatch(item -> "consumers".equals(item.value)));
+        assertNotNull(descriptor);
+        ComboBoxModel items = descriptor.doFillTenantIdItems();
+        assertTrue(items.stream().anyMatch("organizations"::equals));
+        assertTrue(items.stream().anyMatch("common"::equals));
+        assertTrue(items.stream().anyMatch("consumers"::equals));
     }
 }
-
-

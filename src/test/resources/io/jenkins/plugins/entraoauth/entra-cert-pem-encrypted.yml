@@ -4,8 +4,8 @@ credentials:
       - credentials:
           - entraCertPem:
               scope: GLOBAL
-              id: "Entra-cert-pem"
-              description: "Entra cert PEM"
+              id: "Entra-cert-pem-encrypted"
+              description: "Entra cert PEM encrypted key"
               tenantId: "tenant-guid"
               clientId: "client-id"
               certificatePem: |
@@ -20,14 +20,15 @@ credentials:
                 bSxg9x6Hn8Zf7F7k0c2kq9C2GQ3m1t8V8p8tZ6k=
                 -----END CERTIFICATE-----
               privateKeyPem: |
-                -----BEGIN PRIVATE KEY-----
-                MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg6Q2b7WnWQy2i3g0E
-                fX9d9gOQ0b2Wv6F8mT0w1nuhRANCAAS3Sukuk+qtmzOF/fl+0Jx9n/f9jOqpS+qu
-                qtKfRN3t4SfhO7D4ws9itTu6/E9xSfDNHPUdX11n9h9hUJs=
-                -----END PRIVATE KEY-----
+                -----BEGIN ENCRYPTED PRIVATE KEY-----
+                MIIBvTBXBgkqhkiG9w0BBQ0wSjApBgkqhkiG9w0BBQwwHAQI8W8WgQ7fY9ECAggA
+                MAwGCCqGSIb3DQIJBQAwHQYJYIZIAWUDBAEqBBCN58t8V2j7wJGX1hW7ZV5jBIIB
+                YNqW4VK5AQ8ht0n0jJ2xN2U2x9D8M4f2mW1UQ0Uu2G8Q9vW2Hn4yX1wYI3kQzBhc
+                Pj0P6L1mQn7QY0d9xj1bqA1JmQ2hJr2xHkJ2wY6z9f8W6s7c4d3b2a1z0x9v8u7t
+                6s5r4q3p2n1m0l9k8j7h6g5f4d3s2a1q0w9e8r7t6y5u4i3o2p1a0s9d8f7g6h5j
+                k4l3z2x1c0v9b8n7m6a5s4d3f2g1h0j9k8l7m6n5b4v3c2x1z0a9s8d7f6g5h4j3
+                -----END ENCRYPTED PRIVATE KEY-----
+              privateKeyPassword: "changeit"
               scopes: "scope1"
               username: "user@example.com"
               authorityHost: "https://login.microsoftonline.com"
-
-
-

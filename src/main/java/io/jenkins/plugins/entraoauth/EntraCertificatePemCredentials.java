@@ -1,6 +1,5 @@
 package io.jenkins.plugins.entraoauth;
 
-import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.microsoft.aad.msal4j.ClientCredentialFactory;
 import com.microsoft.aad.msal4j.IClientCredential;
@@ -9,7 +8,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.Util;
 import hudson.util.FormValidation;
-import hudson.util.ListBoxModel;
 import hudson.util.Secret;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
@@ -22,8 +20,9 @@ import org.kohsuke.stapler.interceptor.RequirePOST;
  */
 public class EntraCertificatePemCredentials extends EntraServicePrincipalCredentials {
 
-    private final String certificatePem;
+    private final Secret certificatePem;
     private final Secret privateKeyPem;
+    private final Secret privateKeyPassword;
 
     /**
      * Creates PEM certificate credentials.
@@ -35,21 +34,23 @@ public class EntraCertificatePemCredentials extends EntraServicePrincipalCredent
             @CheckForNull String description,
             @CheckForNull String tenantId,
             @CheckForNull String clientId,
-            @CheckForNull String certificatePem,
+            @CheckForNull Secret certificatePem,
             @CheckForNull Secret privateKeyPem,
+            @CheckForNull Secret privateKeyPassword,
             @CheckForNull String scopes,
             @CheckForNull String username,
             @CheckForNull String authorityHost) {
         super(scope, id, description, tenantId, clientId, scopes, username, authorityHost);
-        this.certificatePem = Util.fixEmptyAndTrim(certificatePem);
+        this.certificatePem = certificatePem;
         this.privateKeyPem = privateKeyPem;
+        this.privateKeyPassword = privateKeyPassword;
     }
 
     /**
      * Returns the PEM-encoded certificate.
      */
-    public String getCertificatePem() {
-        return certificatePem == null ? "" : certificatePem;
+    public Secret getCertificatePem() {
+        return certificatePem;
     }
 
     /**
@@ -59,16 +60,22 @@ public class EntraCertificatePemCredentials extends EntraServicePrincipalCredent
         return privateKeyPem;
     }
 
+    /**
+     * Returns the password for the private key.
+     */
+    public Secret getPrivateKeyPassword() { return privateKeyPassword; }
+
     @Override
     protected IClientCredential createClientCredential() throws Exception {
         return ClientCredentialFactory.createFromCertificate(
-                PemUtils.parsePrivateKey(Secret.toString(privateKeyPem)),
-                PemUtils.parseCertificate(certificatePem));
+                PemUtils.parsePrivateKey(Secret.toString(privateKeyPem), Secret.toString(privateKeyPassword)),
+                PemUtils.parseCertificate(Secret.toString(certificatePem)));
     }
 
     @Extension
     @Symbol("entraCertPem")
-    public static class DescriptorImpl extends CredentialsDescriptor {
+    @SuppressWarnings("unused")
+    public static class DescriptorImpl extends AbstractEntraCredentialsDescriptor {
         /**
          * Returns the display name for this credential type.
          */
@@ -79,46 +86,9 @@ public class EntraCertificatePemCredentials extends EntraServicePrincipalCredent
         }
 
         /**
-         * Provides tenant ID suggestions.
-         */
-        public ListBoxModel doFillTenantIdItems() {
-            ListBoxModel items = new ListBoxModel();
-            items.add("organizations");
-            items.add("common");
-            items.add("consumers");
-            return items;
-        }
-
-        /**
-         * Returns the default authority host.
-         */
-        public String getDefaultAuthorityHost() {
-            return defaultAuthorityHost();
-        }
-
-        /**
-         * Validates tenant ID input.
-         */
-        public FormValidation doCheckTenantId(@QueryParameter String value) {
-            if (Util.fixEmptyAndTrim(value) == null) {
-                return FormValidation.error(Messages.FormValidation_TenantIdRequired());
-            }
-            return FormValidation.ok();
-        }
-
-        /**
-         * Validates client ID input.
-         */
-        public FormValidation doCheckClientId(@QueryParameter String value) {
-            if (Util.fixEmptyAndTrim(value) == null) {
-                return FormValidation.error(Messages.FormValidation_ClientIdRequired());
-            }
-            return FormValidation.ok();
-        }
-
-        /**
          * Validates certificate PEM input.
          */
+        @SuppressWarnings("unused")
         public FormValidation doCheckCertificatePem(@QueryParameter String value) {
             try {
                 PemUtils.parseCertificate(value);
@@ -133,9 +103,11 @@ public class EntraCertificatePemCredentials extends EntraServicePrincipalCredent
         /**
          * Validates private key PEM input.
          */
-        public FormValidation doCheckPrivateKeyPem(@QueryParameter String value) {
+        @SuppressWarnings("unused")
+        public FormValidation doCheckPrivateKeyPem(
+                @QueryParameter String value, @QueryParameter Secret privateKeyPassword) {
             try {
-                PemUtils.parsePrivateKey(value);
+                PemUtils.parsePrivateKey(value, Secret.toString(privateKeyPassword));
                 return FormValidation.ok();
             } catch (IllegalArgumentException e) {
                 return FormValidation.error(Messages.FormValidation_ErrorWithDetail(e.getMessage()));
@@ -145,24 +117,16 @@ public class EntraCertificatePemCredentials extends EntraServicePrincipalCredent
         }
 
         /**
-         * Validates scopes input.
-         */
-        public FormValidation doCheckScopes(@QueryParameter String value) {
-            if (ScopeUtils.parseScopes(value).isEmpty()) {
-                return FormValidation.error(Messages.FormValidation_ScopesRequired());
-            }
-            return FormValidation.ok();
-        }
-
-        /**
          * Tests token acquisition with the provided settings.
          */
         @RequirePOST
+        @SuppressWarnings("unused")
         public FormValidation doTestConnection(
                 @QueryParameter String tenantId,
                 @QueryParameter String clientId,
-                @QueryParameter String certificatePem,
+                @QueryParameter Secret certificatePem,
                 @QueryParameter Secret privateKeyPem,
+                @QueryParameter Secret privateKeyPassword,
                 @QueryParameter String scopes,
                 @QueryParameter String username,
                 @QueryParameter String authorityHost) {
@@ -187,6 +151,7 @@ public class EntraCertificatePemCredentials extends EntraServicePrincipalCredent
                         clientId,
                         certificatePem,
                         privateKeyPem,
+                        privateKeyPassword,
                         scopes,
                         username,
                         authorityHost);

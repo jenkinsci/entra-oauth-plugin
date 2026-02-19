@@ -4,32 +4,35 @@
   <f:entry title="${%Scope}" field="scope">
     <f:select />
   </f:entry>
-  <f:entry title="${%Tenant ID}" field="tenantId" help="/plugin/entra-oauth-plugin/help/tenantId.html">
+  <f:entry title="${%Tenant ID}" field="tenantId" help="/plugin/entra-oauth/help/tenantId.html">
     <f:combobox />
   </f:entry>
-  <f:entry title="${%Client ID}" field="clientId" help="/plugin/entra-oauth-plugin/help/clientId.html">
+  <f:entry title="${%Client ID}" field="clientId" help="/plugin/entra-oauth/help/clientId.html">
+    <f:textbox clazz="required" checkMessage="${%Client ID is required}" />
+  </f:entry>
+  <f:entry title="${%PEM Certificate}" field="certificatePem" help="/plugin/entra-oauth/help/certificatePem.html">
+    <f:secretTextarea />
+  </f:entry>
+  <f:entry title="${%PEM Private Key}" field="privateKeyPem" help="/plugin/entra-oauth/help/privateKeyPem.html">
+    <f:secretTextarea />
+  </f:entry>
+  <f:entry title="${%PEM Private Key Password}" field="privateKeyPassword" help="/plugin/entra-oauth/help/privateKeyPemPassword.html">
+    <f:password/>
+  </f:entry>
+  <f:entry title="${%Username}" field="username" help="/plugin/entra-oauth/help/username.html">
     <f:textbox />
   </f:entry>
-  <f:entry title="${%PEM Certificate}" field="certificatePem" help="/plugin/entra-oauth-plugin/help/certificatePem.html">
+  <f:entry title="${%Scopes}" field="scopes" help="/plugin/entra-oauth/help/scopes.html">
     <f:textarea />
   </f:entry>
-  <f:entry title="${%PEM Private Key}" field="privateKeyPem" help="/plugin/entra-oauth-plugin/help/privateKeyPem.html">
-    <f:textarea />
-  </f:entry>
-  <f:entry title="${%Username}" field="username" help="/plugin/entra-oauth-plugin/help/username.html">
-    <f:textbox />
-  </f:entry>
-  <f:entry title="${%Scopes}" field="scopes" help="/plugin/entra-oauth-plugin/help/scopes.html">
-    <f:textarea />
-  </f:entry>
-  <f:entry title="${%Authority Host}" field="authorityHost" help="/plugin/entra-oauth-plugin/help/authorityHost.html">
-    <f:textbox default="${descriptor.defaultAuthorityHost}" />
+  <f:entry title="${%Authority Host}" field="authorityHost" help="/plugin/entra-oauth/help/authorityHost.html">
+    <f:textbox default="${descriptor.defaultAuthorityHost}" clazz="required" checkMessage="${%An authority host is required}" />
   </f:entry>
   <f:entry title="${%Test Token}">
     <f:validateButton
       title="${%Test Token}"
       progress="${%Testing...}"
       method="testConnection"
-      with="tenantId,clientId,certificatePem,privateKeyPem,scopes,username,authorityHost" />
+      with="tenantId,clientId,certificatePem,privateKeyPem,privateKeyPassword,scopes,username,authorityHost" />
   </f:entry>
 </j:jelly>

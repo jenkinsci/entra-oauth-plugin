@@ -17,6 +17,7 @@ public class EntraOAuth2ScopeRequirement extends OAuth2ScopeRequirement {
      * Creates a scope requirement with the provided scopes.
      */
     @DataBoundConstructor
+    @SuppressWarnings("unused")
     public EntraOAuth2ScopeRequirement(@NonNull Collection<String> scopes) {
         this.scopes = scopes;
     }

@@ -10,7 +10,7 @@
 
   <groupId>io.jenkins.plugins</groupId>
   <artifactId>entra-oauth</artifactId>
-  <version>${revision}${changelist}</version>
+  <version>${changelist}</version>
   <packaging>hpi</packaging>
 
   <name>Microsoft Entra OAuth Credentials Plugin</name>
@@ -33,7 +33,6 @@
 
   <properties>
     <revision>0.1</revision>
-    <changelist>-SNAPSHOT</changelist>
     <jenkins.baseline>2.541</jenkins.baseline>
     <jenkins.version>${jenkins.baseline}.1</jenkins.version>
     <changelist>999999-SNAPSHOT</changelist>
@@ -63,9 +62,13 @@
       <artifactId>oauth-credentials</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.microsoft.azure</groupId>
-      <artifactId>msal4j</artifactId>
-      <version>1.23.1</version>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>bouncycastle-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>azure-sdk</artifactId>
+      <version>259.vf079c96088a_f</version>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
@@ -85,8 +88,8 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -104,5 +107,4 @@
     </pluginRepository>
   </pluginRepositories>
 </project>
-
 

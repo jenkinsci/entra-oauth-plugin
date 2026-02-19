@@ -1,6 +1,5 @@
 package io.jenkins.plugins.entraoauth;
 
-import com.cloudbees.plugins.credentials.CredentialsDescriptor;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.microsoft.aad.msal4j.ClientCredentialFactory;
 import com.microsoft.aad.msal4j.IClientCredential;
@@ -9,7 +8,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.Util;
 import hudson.util.FormValidation;
-import hudson.util.ListBoxModel;
 import hudson.util.Secret;
 import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
@@ -61,78 +59,21 @@ public class EntraClientSecretCredentials extends EntraServicePrincipalCredentia
 
     @Extension
     @Symbol("entraClientSecret")
-    public static class DescriptorImpl extends CredentialsDescriptor {
+    public static class DescriptorImpl extends AbstractEntraCredentialsDescriptor {
         /**
          * Returns the display name for this credential type.
          */
         @Override
         @NonNull
         public String getDisplayName() {
-            return Messages.entraClientSecretCredentials_DisplayName();
-        }
-
-        /**
-         * Provides tenant ID suggestions.
-         */
-        public ListBoxModel doFillTenantIdItems() {
-            ListBoxModel items = new ListBoxModel();
-            items.add("organizations");
-            items.add("common");
-            items.add("consumers");
-            return items;
-        }
-
-        /**
-         * Returns the default authority host.
-         */
-        public String getDefaultAuthorityHost() {
-            return defaultAuthorityHost();
-        }
-
-        /**
-         * Validates tenant ID input.
-         */
-        public FormValidation doCheckTenantId(@QueryParameter String value) {
-            if (Util.fixEmptyAndTrim(value) == null) {
-                return FormValidation.error(Messages.FormValidation_TenantIdRequired());
-            }
-            return FormValidation.ok();
-        }
-
-        /**
-         * Validates client ID input.
-         */
-        public FormValidation doCheckClientId(@QueryParameter String value) {
-            if (Util.fixEmptyAndTrim(value) == null) {
-                return FormValidation.error(Messages.FormValidation_ClientIdRequired());
-            }
-            return FormValidation.ok();
-        }
-
-        /**
-         * Validates client secret input.
-         */
-        public FormValidation doCheckClientSecret(@QueryParameter String value) {
-            if (Util.fixEmptyAndTrim(value) == null) {
-                return FormValidation.error(Messages.FormValidation_ClientSecretRequired());
-            }
-            return FormValidation.ok();
-        }
-
-        /**
-         * Validates scopes input.
-         */
-        public FormValidation doCheckScopes(@QueryParameter String value) {
-            if (ScopeUtils.parseScopes(value).isEmpty()) {
-                return FormValidation.error(Messages.FormValidation_ScopesRequired());
-            }
-            return FormValidation.ok();
+            return Messages.EntraClientSecretCredentials_DisplayName();
         }
 
         /**
          * Tests token acquisition with the provided settings.
          */
         @RequirePOST
+        @SuppressWarnings("unused")
         public FormValidation doTestConnection(
                 @QueryParameter String tenantId,
                 @QueryParameter String clientId,
