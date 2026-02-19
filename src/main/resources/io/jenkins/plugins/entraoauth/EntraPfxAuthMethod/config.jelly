@@ -1,0 +1,9 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+  <f:entry title="${%Base64 Encoded PFX}" field="certificateBase64">
+    <f:secretTextarea />
+  </f:entry>
+  <f:entry title="${%Certificate Password}" field="certificatePassword">
+    <f:password />
+  </f:entry>
+</j:jelly>

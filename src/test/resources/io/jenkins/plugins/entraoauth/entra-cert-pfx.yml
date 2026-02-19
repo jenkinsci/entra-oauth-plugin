@@ -2,17 +2,16 @@ credentials:
   system:
     domainCredentials:
       - credentials:
-          - entraCertPfx:
+          - entraOAuth:
               scope: GLOBAL
-              id: "Entra-cert-pfx"
+              id: "entra-cert-pfx"
               description: "Entra cert PFX"
               tenantId: "tenant-guid"
               clientId: "client-id"
-              certificateBase64: "dGVzdA=="
-              certificatePassword: "pfx-password"
+              authenticationMethod:
+                entraPfxAuth:
+                  certificateBase64: "dGVzdA=="
+                  certificatePassword: "pfx-password"
               scopes: "scope1"
               username: "user@example.com"
               authorityHost: "https://login.microsoftonline.com"
-
-
-

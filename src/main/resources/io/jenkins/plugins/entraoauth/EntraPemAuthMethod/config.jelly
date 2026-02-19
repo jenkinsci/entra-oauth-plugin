@@ -1,0 +1,12 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+  <f:entry title="${%PEM Certificate}" field="certificatePem">
+    <f:secretTextarea />
+  </f:entry>
+  <f:entry title="${%PEM Private Key}" field="privateKeyPem">
+    <f:secretTextarea />
+  </f:entry>
+  <f:entry title="${%PEM Private Key Password}" field="privateKeyPassword">
+    <f:password />
+  </f:entry>
+</j:jelly>

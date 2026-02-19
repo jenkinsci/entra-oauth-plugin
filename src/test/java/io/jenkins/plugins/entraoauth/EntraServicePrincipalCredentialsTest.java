@@ -28,13 +28,13 @@ public class EntraServicePrincipalCredentialsTest {
      */
     @Test
     public void defaultsAndScopeParsing() {
-        EntraServicePrincipalCredentials credentials = new EntraClientSecretCredentials(
+        EntraOAuthCredentials credentials = new EntraOAuthCredentials(
                 CredentialsScope.GLOBAL,
                 "id",
                 "desc",
                 "tenant",
                 "client",
-                Secret.fromString("secret"),
+                new EntraClientSecretAuthMethod(Secret.fromString("secret")),
                 "scope1, scope2\nscope3",
                 "user",
                 "https://login.microsoftonline.com/");
@@ -88,7 +88,6 @@ public class EntraServicePrincipalCredentialsTest {
         assertEquals(Messages.PemUtils_PrivateKeyPasswordRequiredForEncryptedKey(), ex.getMessage());
     }
 
-    @SuppressWarnings("SameParameterValue")
     private static String toPem(String type, byte[] data) {
         String encoded = Base64.getEncoder().encodeToString(data);
         StringBuilder builder = new StringBuilder();

@@ -4,22 +4,20 @@
   <f:entry title="${%Scope}" field="scope">
     <f:select />
   </f:entry>
-  <f:entry title="${%Tenant ID}" field="tenantId" help="/plugin/entra-oauth/help/tenantId.html">
+  <f:entry title="${%Tenant ID}" field="tenantId">
     <f:combobox clazz="required" checkMessage="${%Tenant ID is required}" />
   </f:entry>
-  <f:entry title="${%Client ID}" field="clientId" help="/plugin/entra-oauth/help/clientId.html">
+  <f:entry title="${%Client ID}" field="clientId">
     <f:textbox clazz="required" checkMessage="${%Client ID is required}" />
   </f:entry>
-  <f:entry title="${%Client Secret}" field="clientSecret" help="/plugin/entra-oauth/help/clientSecret.html">
-    <f:password clazz="required" checkMessage="${%Client Secret is required}" />
-  </f:entry>
-  <f:entry title="${%Username}" field="username" help="/plugin/entra-oauth/help/username.html">
+  <f:dropdownDescriptorSelector field="authenticationMethod" title="${%Authentication Method}" />
+  <f:entry title="${%Username}" field="username">
     <f:textbox />
   </f:entry>
-  <f:entry title="${%Scopes}" field="scopes" help="/plugin/entra-oauth/help/scopes.html">
+  <f:entry title="${%Scopes}" field="scopes">
     <f:textarea />
   </f:entry>
-  <f:entry title="${%Authority Host}" field="authorityHost" help="/plugin/entra-oauth/help/authorityHost.html">
+  <f:entry title="${%Authority Host}" field="authorityHost">
     <f:textbox default="${descriptor.defaultAuthorityHost}" clazz="required" checkMessage="${%Authority Host is required}" />
   </f:entry>
   <f:entry title="${%Test Token}">
@@ -27,6 +25,6 @@
       title="${%Test Token}"
       progress="${%Testing...}"
       method="testConnection"
-      with="tenantId,clientId,clientSecret,scopes,username,authorityHost" />
+      with="tenantId,clientId,authenticationMethod.stapler-class,authenticationMethod.$class,clientSecret,certificateBase64,certificatePassword,certificatePem,privateKeyPem,privateKeyPassword,scopes,username,authorityHost" />
   </f:entry>
 </j:jelly>
