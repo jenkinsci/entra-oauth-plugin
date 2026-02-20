@@ -47,13 +47,5 @@ public class EntraClientSecretAuthMethod extends EntraAuthMethod {
         public String getDisplayName() {
             return Messages.EntraClientSecretAuthMethod_DisplayName();
         }
-
-        @SuppressWarnings("unused")
-        public FormValidation doCheckClientSecret(@QueryParameter String value) {
-            if (Util.fixEmptyAndTrim(value) == null) {
-                return FormValidation.error(Messages.FormValidation_ClientSecretRequired());
-            }
-            return FormValidation.ok();
-        }
     }
 }

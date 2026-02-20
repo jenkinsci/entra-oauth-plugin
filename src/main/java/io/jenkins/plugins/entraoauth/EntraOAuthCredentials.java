@@ -185,7 +185,8 @@ public class EntraOAuthCredentials extends BaseStandardCredentials
         /**
          * Provides tenant ID suggestions.
          */
-        ComboBoxModel doFillTenantIdItems() {
+        @SuppressWarnings("unused")
+        public ComboBoxModel doFillTenantIdItems() {
             ComboBoxModel items = new ComboBoxModel();
             items.add("organizations");
             items.add("common");
@@ -208,14 +209,6 @@ public class EntraOAuthCredentials extends BaseStandardCredentials
         public FormValidation doCheckScopes(@QueryParameter String value) {
             if (ScopeUtils.parseScopes(value).isEmpty()) {
                 return FormValidation.error(Messages.FormValidation_ScopesRequired());
-            }
-            return FormValidation.ok();
-        }
-
-        @SuppressWarnings("unused")
-        public FormValidation doCheckAuthorityHost(@QueryParameter String value) {
-            if (Util.fixEmpty(value) == null) {
-                return FormValidation.error(Messages.FormValidation_AuthorityHostRequired());
             }
             return FormValidation.ok();
         }
