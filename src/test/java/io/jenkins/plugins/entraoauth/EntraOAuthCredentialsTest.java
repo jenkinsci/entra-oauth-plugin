@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 /**
  * Unit tests for Entra credential parsing behavior.
  */
-public class EntraServicePrincipalCredentialsTest {
+public class EntraOAuthCredentialsTest {
 
     /**
      * Verifies defaults and scope parsing.

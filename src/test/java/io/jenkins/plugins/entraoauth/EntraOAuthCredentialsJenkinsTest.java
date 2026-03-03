@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Jenkins integration tests for Entra credentials.
  */
 @WithJenkins
-public class EntraServicePrincipalCredentialsJenkinsTest {
+public class EntraOAuthCredentialsJenkinsTest {
 
     /**
      * Verifies credentials can be stored and retrieved.
