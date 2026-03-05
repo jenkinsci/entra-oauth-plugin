@@ -54,20 +54,6 @@ public class EntraOAuthCredentialBindingPipelineTest {
         }
     }
 
-    static class ScopeCapturingCredentials extends StubCredentials {
-        Collection<String> capturedScopes;
-
-        ScopeCapturingCredentials(String id) {
-            super(id, "user", "scope-token", false);
-        }
-
-        @Override
-        public Secret getAccessToken(OAuth2ScopeRequirement requirement) {
-            capturedScopes = requirement != null ? requirement.getScopes() : null;
-            return super.getAccessToken(requirement);
-        }
-    }
-
     private static CredentialsStore getStore(JenkinsRule jenkins) {
         for (CredentialsStore store : CredentialsProvider.lookupStores(jenkins.getInstance())) {
             return store;
@@ -95,8 +81,7 @@ public class EntraOAuthCredentialBindingPipelineTest {
                 + "    withCredentials([entraOAuth2(\n"
                 + "        credentialsId: 'cid',\n"
                 + "        usernameVariable: 'USERNAME',\n"
-                + "        tokenVariable: 'TOKEN',\n"
-                + "        scopes: ['https://graph.microsoft.com/.default']\n"
+                + "        tokenVariable: 'TOKEN'\n"
                 + "    )]) {\n"
                 + "        echo \"user=${env.USERNAME}\"\n"
                 + "    }\n"
@@ -104,35 +89,6 @@ public class EntraOAuthCredentialBindingPipelineTest {
 
         WorkflowRun run = jenkins.buildAndAssertSuccess(project);
         jenkins.assertLogContains("user=alice", run);
-    }
-
-    /**
-     * Verifies that multiple scopes can be passed as a list in pipeline syntax.
-     */
-    @Test
-    public void withCredentialsStepAcceptsMultipleScopes(JenkinsRule jenkins) throws Exception {
-        List<String> expectedScopes = List.of("https://graph.microsoft.com/.default", "openid");
-        ScopeCapturingCredentials credentials = new ScopeCapturingCredentials("cid-scopes");
-        getStore(jenkins).addCredentials(Domain.global(), credentials);
-
-        WorkflowJob project = jenkins.createProject(WorkflowJob.class);
-        project.setDefinition(new CpsFlowDefinition(
-                "node {\n"
-                + "    withCredentials([entraOAuth2(\n"
-                + "        credentialsId: 'cid-scopes',\n"
-                + "        usernameVariable: 'U',\n"
-                + "        tokenVariable: 'T',\n"
-                + "        scopes: ['https://graph.microsoft.com/.default', 'openid']\n"
-                + "    )]) {\n"
-                + "        echo 'ok'\n"
-                + "    }\n"
-                + "}", true));
-
-        jenkins.buildAndAssertSuccess(project);
-
-        assertNotNull(credentials.capturedScopes, "getAccessToken should have been called");
-        assertTrue(credentials.capturedScopes.containsAll(expectedScopes));
-        assertEquals(expectedScopes.size(), credentials.capturedScopes.size());
     }
 
     /**
@@ -146,8 +102,7 @@ public class EntraOAuthCredentialBindingPipelineTest {
                 + "    withCredentials([entraOAuth2(\n"
                 + "        credentialsId: 'does-not-exist',\n"
                 + "        usernameVariable: 'U',\n"
-                + "        tokenVariable: 'T',\n"
-                + "        scopes: ['scope']\n"
+                + "        tokenVariable: 'T'\n"
                 + "    )]) {\n"
                 + "        echo 'should not reach here'\n"
                 + "    }\n"
@@ -170,8 +125,7 @@ public class EntraOAuthCredentialBindingPipelineTest {
                 + "    withCredentials([entraOAuth2(\n"
                 + "        credentialsId: 'cid-secret',\n"
                 + "        usernameVariable: 'USERNAME',\n"
-                + "        tokenVariable: 'TOKEN',\n"
-                + "        scopes: ['scope']\n"
+                + "        tokenVariable: 'TOKEN'\n"
                 + "    )]) {\n"
                 + "        echo env.USERNAME\n"
                 + "    }\n"
