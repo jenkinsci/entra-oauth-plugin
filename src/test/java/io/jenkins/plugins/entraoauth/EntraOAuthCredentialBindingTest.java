@@ -58,24 +58,6 @@ public class EntraOAuthCredentialBindingTest {
         }
     }
 
-    /**
-     * Credentials stub that records the {@link OAuth2ScopeRequirement} passed to
-     * {@link #getAccessToken} so tests can inspect which scopes were requested.
-     */
-    static class ScopeCapturingCredentials extends StubCredentials {
-        Collection<String> capturedScopes;
-
-        ScopeCapturingCredentials(String id) {
-            super(id, "user", "scope-token", false);
-        }
-
-        @Override
-        public Secret getAccessToken(OAuth2ScopeRequirement requirement) {
-            capturedScopes = requirement != null ? requirement.getScopes() : null;
-            return super.getAccessToken(requirement);
-        }
-    }
-
     private static CredentialsStore getStore(JenkinsRule jenkins) {
         for (CredentialsStore store : CredentialsProvider.lookupStores(jenkins.getInstance())) {
             return store;
@@ -90,7 +72,7 @@ public class EntraOAuthCredentialBindingTest {
     @Test
     public void gettersReturnConstructorValues() {
         EntraOAuthCredentialBinding binding = new EntraOAuthCredentialBinding(
-                "MY_USER", "MY_TOKEN", List.of("https://graph.microsoft.com/.default"), "cred-id");
+                "MY_USER", "MY_TOKEN", "cred-id");
 
         assertEquals("MY_USER", binding.getUsernameVariable());
         assertEquals("MY_TOKEN", binding.getTokenVariable());
@@ -100,7 +82,7 @@ public class EntraOAuthCredentialBindingTest {
     @Test
     public void typeIsEntraOAuthCredentials() {
         EntraOAuthCredentialBinding binding = new EntraOAuthCredentialBinding(
-                "U", "T", List.of("scope"), "id");
+                "U", "T", "id");
         assertEquals(EntraOAuthCredentials.class, binding.type());
     }
 
@@ -136,7 +118,7 @@ public class EntraOAuthCredentialBindingTest {
         FreeStyleProject project = jenkins.createFreeStyleProject();
         project.getBuildWrappersList().add(new SecretBuildWrapper(List.of(
                 new EntraOAuthCredentialBinding("USERNAME", "ACCESS_TOKEN",
-                        List.of("https://graph.microsoft.com/.default"), "cid"))));
+                        "cid"))));
         project.getBuildersList().add(capture);
 
         jenkins.buildAndAssertSuccess(project);
@@ -147,32 +129,13 @@ public class EntraOAuthCredentialBindingTest {
 
     @Test
     @WithJenkins
-    public void bindPassesScopesToGetAccessToken(JenkinsRule jenkins) throws Exception {
-        List<String> expectedScopes = List.of("https://graph.microsoft.com/.default", "openid");
-        ScopeCapturingCredentials credentials = new ScopeCapturingCredentials("cid-scopes");
-        getStore(jenkins).addCredentials(Domain.global(), credentials);
-
-        FreeStyleProject project = jenkins.createFreeStyleProject();
-        project.getBuildWrappersList().add(new SecretBuildWrapper(List.of(
-                new EntraOAuthCredentialBinding("U", "T", expectedScopes, "cid-scopes"))));
-        project.getBuildersList().add(new CaptureEnvironmentBuilder());
-
-        jenkins.buildAndAssertSuccess(project);
-
-        assertNotNull(credentials.capturedScopes, "getAccessToken should have been called with a scope requirement");
-        assertTrue(credentials.capturedScopes.containsAll(expectedScopes));
-        assertEquals(expectedScopes.size(), credentials.capturedScopes.size());
-    }
-
-    @Test
-    @WithJenkins
     public void variablesIncludesUsernameWhenItIsSecret(JenkinsRule jenkins) throws Exception {
         getStore(jenkins).addCredentials(Domain.global(),
                 new StubCredentials("cid-secret", "user", "tok", true));
 
         FreeStyleProject project = jenkins.createFreeStyleProject();
         EntraOAuthCredentialBinding binding = new EntraOAuthCredentialBinding(
-                "MY_USER", "MY_TOKEN", List.of("scope"), "cid-secret");
+                "MY_USER", "MY_TOKEN", "cid-secret");
         project.getBuildWrappersList().add(new SecretBuildWrapper(List.of(binding)));
 
         FreeStyleBuild build = jenkins.buildAndAssertSuccess(project);
@@ -190,7 +153,7 @@ public class EntraOAuthCredentialBindingTest {
 
         FreeStyleProject project = jenkins.createFreeStyleProject();
         EntraOAuthCredentialBinding binding = new EntraOAuthCredentialBinding(
-                "MY_USER", "MY_TOKEN", List.of("scope"), "cid-public");
+                "MY_USER", "MY_TOKEN", "cid-public");
         project.getBuildWrappersList().add(new SecretBuildWrapper(List.of(binding)));
 
         FreeStyleBuild build = jenkins.buildAndAssertSuccess(project);

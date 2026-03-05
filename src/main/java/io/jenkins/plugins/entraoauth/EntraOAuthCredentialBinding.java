@@ -19,14 +19,12 @@ import java.util.*;
 public class EntraOAuthCredentialBinding extends MultiBinding<EntraOAuthCredentials> {
     private final String usernameVariable;
     private final String tokenVariable;
-    private final Set<String> scopes;
 
     @DataBoundConstructor
-    public EntraOAuthCredentialBinding(String usernameVariable, String tokenVariable, List<String> scopes, String credentialsId) {
+    public EntraOAuthCredentialBinding(String usernameVariable, String tokenVariable, String credentialsId) {
         super(credentialsId);
         this.usernameVariable = usernameVariable;
         this.tokenVariable = tokenVariable;
-        this.scopes = new LinkedHashSet<>(scopes);
     }
 
     public String getUsernameVariable() {
@@ -50,7 +48,7 @@ public class EntraOAuthCredentialBinding extends MultiBinding<EntraOAuthCredenti
         Map<String, String> secretValues = new LinkedHashMap<>();
         Map<String, String> publicValues = new LinkedHashMap<>();
         (credentials.isUsernameSecret() ? secretValues : publicValues).put(usernameVariable, credentials.getUsername());
-        EntraOAuth2ScopeRequirement requirement = new EntraOAuth2ScopeRequirement(this.scopes);
+        EntraOAuth2ScopeRequirement requirement = new EntraOAuth2ScopeRequirement(credentials.getScopeList());
         secretValues.put(tokenVariable, credentials.getAccessToken(requirement).getPlainText());
         return new MultiEnvironment(secretValues, publicValues);
     }
