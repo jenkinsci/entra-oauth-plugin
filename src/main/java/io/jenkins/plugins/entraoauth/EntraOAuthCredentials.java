@@ -1,7 +1,7 @@
 package io.jenkins.plugins.entraoauth;
 
-import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.CredentialsDescriptor;
+import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.impl.BaseStandardCredentials;
 import com.google.jenkins.plugins.credentials.oauth.OAuth2ScopeRequirement;
 import com.google.jenkins.plugins.credentials.oauth.StandardUsernameOAuth2Credentials;
@@ -18,6 +18,7 @@ import hudson.util.ComboBoxModel;
 import hudson.util.FormValidation;
 import hudson.util.Secret;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -118,10 +119,16 @@ public class EntraOAuthCredentials extends BaseStandardCredentials
             return null;
         }
 
+        if (!validateScopesCompatibility(requirement, requestedScopes)) {
+            LOGGER.log(Level.WARNING, "Requested scopes are not compatible with credential's configured scopes");
+            return null;
+        }
+
         try {
             IConfidentialClientApplication app = getApplication();
             Set<String> scopeSet = new LinkedHashSet<>(requestedScopes);
-            ClientCredentialParameters params = ClientCredentialParameters.builder(scopeSet).build();
+            ClientCredentialParameters params =
+                    ClientCredentialParameters.builder(scopeSet).build();
             IAuthenticationResult result = app.acquireToken(params).get();
             if (result == null || result.accessToken() == null) {
                 return null;
@@ -146,10 +153,34 @@ public class EntraOAuthCredentials extends BaseStandardCredentials
     }
 
     private Collection<String> getScopesFromRequirement(OAuth2ScopeRequirement requirement) {
-        if (requirement != null && requirement.getScopes() != null && !requirement.getScopes().isEmpty()) {
+        if (requirement != null
+                && requirement.getScopes() != null
+                && !requirement.getScopes().isEmpty()) {
             return requirement.getScopes();
         }
         return getScopeList();
+    }
+
+    /**
+     * Validates that requested scopes are compatible with credential's configured scopes.
+     */
+    private boolean validateScopesCompatibility(
+            @CheckForNull OAuth2ScopeRequirement requirement, Collection<String> requestedScopes) {
+        if (requirement == null
+                || requirement.getScopes() == null
+                || requirement.getScopes().isEmpty()) {
+            return true;
+        }
+
+        Set<String> configuredScopes = new HashSet<>(getScopeList());
+
+        for (String requested : requestedScopes) {
+            if (!configuredScopes.contains(requested)) {
+                LOGGER.log(Level.WARNING, "Requested scope ''{0}'' is not in configured scopes", requested);
+                return false;
+            }
+        }
+        return true;
     }
 
     private IConfidentialClientApplication getApplication() throws Exception {
