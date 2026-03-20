@@ -119,7 +119,7 @@ public class EntraOAuthCredentials extends BaseStandardCredentials
             return null;
         }
 
-        if (!validateScopesCompatibility(requirement, requestedScopes)) {
+        if (!validateScopesCompatibility(requestedScopes)) {
             LOGGER.log(Level.WARNING, "Requested scopes are not compatible with credential's configured scopes");
             return null;
         }
@@ -165,13 +165,8 @@ public class EntraOAuthCredentials extends BaseStandardCredentials
      * Validates that requested scopes are compatible with credential's configured scopes.
      */
     private boolean validateScopesCompatibility(
-            @CheckForNull OAuth2ScopeRequirement requirement, Collection<String> requestedScopes) {
-        if (requirement == null
-                || requirement.getScopes() == null
-                || requirement.getScopes().isEmpty()) {
-            return true;
-        }
-
+            Collection<String> requestedScopes) {
+     
         Set<String> configuredScopes = new HashSet<>(getScopeList());
 
         for (String requested : requestedScopes) {
