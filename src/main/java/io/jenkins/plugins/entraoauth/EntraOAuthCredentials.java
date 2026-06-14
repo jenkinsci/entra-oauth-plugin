@@ -10,6 +10,7 @@ import com.microsoft.aad.msal4j.ConfidentialClientApplication;
 import com.microsoft.aad.msal4j.IAuthenticationResult;
 import com.microsoft.aad.msal4j.IClientCredential;
 import com.microsoft.aad.msal4j.IConfidentialClientApplication;
+import com.microsoft.aad.msal4j.MsalServiceException;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
@@ -114,26 +115,8 @@ public class EntraOAuthCredentials extends BaseStandardCredentials
 
     @Override
     public Secret getAccessToken(OAuth2ScopeRequirement requirement) {
-        Collection<String> requestedScopes = getScopesFromRequirement(requirement);
-        if (requestedScopes.isEmpty()) {
-            return null;
-        }
-
-        if (!validateScopesCompatibility(requestedScopes)) {
-            LOGGER.log(Level.WARNING, "Requested scopes are not compatible with credential's configured scopes");
-            return null;
-        }
-
         try {
-            IConfidentialClientApplication app = getApplication();
-            Set<String> scopeSet = new LinkedHashSet<>(requestedScopes);
-            ClientCredentialParameters params =
-                    ClientCredentialParameters.builder(scopeSet).build();
-            IAuthenticationResult result = app.acquireToken(params).get();
-            if (result == null || result.accessToken() == null) {
-                return null;
-            }
-            return Secret.fromString(result.accessToken());
+            return acquireToken(requirement);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             LOGGER.log(Level.WARNING, "Interrupted while acquiring Entra access token", e);
@@ -143,6 +126,33 @@ public class EntraOAuthCredentials extends BaseStandardCredentials
             LOGGER.log(Level.WARNING, "Unable to acquire Entra access token", e);
         }
         return null;
+    }
+
+    Secret acquireToken(OAuth2ScopeRequirement requirement) throws Exception {
+        Collection<String> requestedScopes = getScopesFromRequirement(requirement);
+        if (requestedScopes.isEmpty()) {
+            return null;
+        }
+        if (!validateScopesCompatibility(requestedScopes)) {
+            LOGGER.log(Level.WARNING, "Requested scopes are not compatible with credential's configured scopes");
+            return null;
+        }
+        IConfidentialClientApplication app = getApplication();
+        Set<String> scopeSet = new LinkedHashSet<>(requestedScopes);
+        ClientCredentialParameters params = ClientCredentialParameters.builder(scopeSet).build();
+        try {
+            IAuthenticationResult result = app.acquireToken(params).get();
+            if (result == null || result.accessToken() == null) {
+                return null;
+            }
+            return Secret.fromString(result.accessToken());
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof MsalServiceException msalEx) {
+                throw new Exception(msalEx.getMessage().split("\\r?\\n")[0].trim(), e);
+            }
+            throw e;
+        }
     }
 
     private IClientCredential createClientCredential() throws Exception {
@@ -295,7 +305,7 @@ public class EntraOAuthCredentials extends BaseStandardCredentials
                         username,
                         authorityHost);
                 Secret token =
-                        credentials.getAccessToken(new EntraOAuth2ScopeRequirement(ScopeUtils.parseScopes(scopes)));
+                        credentials.acquireToken(new EntraOAuth2ScopeRequirement(ScopeUtils.parseScopes(scopes)));
                 if (token == null || Util.fixEmptyAndTrim(token.getPlainText()) == null) {
                     return FormValidation.error(Messages.FormValidation_TestTokenFailed());
                 }
